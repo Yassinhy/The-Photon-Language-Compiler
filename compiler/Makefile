@@ -20,7 +20,7 @@ error_handler/error_handler.c
 OBJS = $(SRCS:.c=.o)
 
 # The name of your final executable
-TARGET = my_compiler
+TARGET = phc
 
 # Default rule: build the compiler
 all: $(TARGET)
@@ -82,4 +82,5 @@ clean:
 
 # # Optional: build with optimization disabled for easier debugging
 # debug: CFLAGS += -O0
+
 # debug: clean all
