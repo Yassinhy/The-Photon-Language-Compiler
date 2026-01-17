@@ -1,5 +1,3 @@
-//
-
 # The Photon Language Compiler
 
 **Photon** is a high-performance, statically-typed compiled language designed for speed, memory efficiency, and low-level control. This repository contains the reference compiler (`phc`), featuring a custom recursive-descent parser, an arena-based memory management system, and a direct x86_64 assembly backend.
@@ -32,6 +30,9 @@ To compile a Photon source file (`.ph`), specify the filename and the target arc
 ```bash
 ./phc <filename>.ph <architecture>
 
+example:
+
+./phc test.ph x86_64
 ```
 
 **Workflow Example:**
@@ -80,7 +81,7 @@ exit x;             // Exit statement (Map to Syscall 60)
 
 The Photon compiler is engineered for high-speed compilation through a streamlined architecture:
 
-* **Frontend**: A hand-written Lexer and Recursive Descent Parser that transforms source code into a structured Abstract Syntax Tree (AST).
+* **Frontend**: A hand-written Lexer, a Pratt Parser and a Recursive Descent Parser that transforms source code into a structured Abstract Syntax Tree (AST).
 * **Memory Management**: Utilizes custom **Arena Allocators** for tokens and nodes. This allows for nearly instantaneous allocation and deallocation of memory across the entire compilation unit, avoiding `malloc` overhead.
 * **Symbol Table**: Implements a nested scope system with stack-offset calculations, ensuring safe variable access and deterministic lifetime management.
 * **Backend**: Generates direct, optimized x86_64 assembly following the **System V AMD64 ABI** calling convention.
@@ -102,4 +103,3 @@ Contributions are welcome! If you want to help expand the backend or optimize th
 ---
 
 *Developed by Yassin — Building the future of systems programming.*
-//
