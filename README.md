@@ -1,23 +1,25 @@
-```markdown
-# ⚛️ The Photon Language Compiler
+//
+
+# The Photon Language Compiler
 
 **Photon** is a high-performance, statically-typed compiled language designed for speed, memory efficiency, and low-level control. This repository contains the reference compiler (`phc`), featuring a custom recursive-descent parser, an arena-based memory management system, and a direct x86_64 assembly backend.
 
-
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
+
 To build and run Photon, you will need a Linux environment with the following installed:
+
 * **NASM**: The Netwide Assembler for generating object files from assembly code.
 * **GCC / LD**: For linking the generated assembly into a final executable.
 * **Make**: To automate the build and compilation process.
 
 ### Installation
+
 Clone the repository and build the compiler using the provided Makefile:
 
 ```bash
-git clone [https://github.com/your-username/The-Photon-Language-Compiler.git](https://github.com/your-username/The-Photon-Language-Compiler.git)
+git clone https://github.com/Yassinhy/The-Photon-Language-Compiler.git
 cd The-Photon-Language-Compiler
 make
 
@@ -74,7 +76,7 @@ exit x;             // Exit statement (Map to Syscall 60)
 
 ```
 
-## 🏗 Compiler Architecture
+## Compiler Architecture
 
 The Photon compiler is engineered for high-speed compilation through a streamlined architecture:
 
@@ -83,11 +85,12 @@ The Photon compiler is engineered for high-speed compilation through a streamlin
 * **Symbol Table**: Implements a nested scope system with stack-offset calculations, ensuring safe variable access and deterministic lifetime management.
 * **Backend**: Generates direct, optimized x86_64 assembly following the **System V AMD64 ABI** calling convention.
 
-## 🗺 Roadmap
+##  My Roadmap
 
 * [x] Basic Integer arithmetic and logic
 * [x] Variable assignments and scoping
 * [x] Function declarations and calls
+* [x] if/ else if/ else statements
 * [ ] Loop constructs (`while`, `for`)
 * [ ] Floating point support (SSE/AVX)
 * [ ] ARM64 Backend implementation
@@ -99,7 +102,4 @@ Contributions are welcome! If you want to help expand the backend or optimize th
 ---
 
 *Developed by Yassin — Building the future of systems programming.*
-
-```
-
-```
+//
