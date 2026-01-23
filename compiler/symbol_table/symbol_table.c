@@ -2,6 +2,7 @@
 #include "arena/arena.h"
 #include "symbol_table/symbol_table.h"
 #include "error_handler/error_handler.h"
+#include <stdlib.h>
 
 
 size_t hash_function(const char* var_name, size_t var_name_length)
@@ -167,4 +168,30 @@ void exit_current_scope(Compiler* compiler) {
     }
 }
 
+
+void push_endifs(Compiler* compiler) {
+    if(compiler->end_ifs->end_ifs_capacity == compiler->end_ifs->end_ifs_count + 1) {
+        compiler->end_ifs->end_ifs_capacity *= 2;
+        size_t* new_ptr = realloc(compiler->end_ifs->end_ifs,compiler->end_ifs->end_ifs_capacity * sizeof(size_t));
+        if(!new_ptr) {
+            panic(ERROR_MEMORY_ALLOCATION, "too many nested if conditions", compiler);
+        }
+        compiler->end_ifs->end_ifs = new_ptr;
+    }
+    compiler->end_ifs->end_ifs[compiler->end_ifs->end_ifs_count] = compiler->if_statements;
+    compiler->end_ifs->end_ifs_count++;
+}
+
+void pop_endifs(Compiler* compiler) {
+    compiler->end_ifs->end_ifs_count--;
+}
+
+size_t peek_endifs(Compiler* compiler) {
+    if (compiler->end_ifs->end_ifs_count == 0)
+    {
+        return 0;
+    }
+    
+    return compiler->end_ifs->end_ifs[compiler->end_ifs->end_ifs_count - 1];
+}
 

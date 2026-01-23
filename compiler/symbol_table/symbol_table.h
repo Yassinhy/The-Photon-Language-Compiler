@@ -16,4 +16,8 @@ void exit_current_scope(Compiler* compiler);
 void append_function_to_func_map(function_node* function_node_input, Compiler* compiler);
 function_node* find_function_symbol_node (char* function_name, size_t function_name_length, Compiler* compiler);
 
+size_t peek_endifs(Compiler* compiler);
+void pop_endifs(Compiler* compiler);
+void push_endifs(Compiler* compiler);
+
 #endif

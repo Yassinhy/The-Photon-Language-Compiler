@@ -4,7 +4,7 @@ _start:
 push rbp
 mov rbp, rsp
 sub rsp, 4
-mov rax, 8
+mov rax, 10
 
 mov [rbp - 4], rax
 push r9
@@ -22,20 +22,6 @@ pop rdx
 pop rcx
 pop r8
 pop r9
-mov rax, 5
-
-push rax
-mov rax, 3
-
-pop rbx
-add rax, rbx
-
-mov [rbp - 4], rax
-mov rax, [rbp - 4]
-
-mov rdi, rax
-mov rax, 60
-syscall
 
 ; Exit program
 mov rax, 60
@@ -58,19 +44,35 @@ mov rax, [rbp - 4]
 
 pop rbx
 cmp rax, rbx
-jne .Lels0
+jne .Lelse_1
 mov rax, 5
 
 mov rdi, rax
 mov rax, 60
 syscall
-jmp .end_if_0
-.Lels0:
+jmp .end_if_1
+.Lelse_1:
+mov rax, rdi
+
+push rax
+mov rax, 10
+
+pop rbx
+cmp rax, rbx
+jne .Lelse_2
+mov rax, 61
+
+mov rdi, rax
+mov rax, 60
+syscall
+jmp .end_if_2
+.Lelse_2:
 mov rax, [rbp - 4]
 
 mov rdi, rax
 mov rax, 60
 syscall
+.end_if_2:
 .end_if_0:
 ret
 

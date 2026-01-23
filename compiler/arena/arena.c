@@ -1,5 +1,6 @@
 #include "utilities/utils.h"
 #include "error_handler/error_handler.h"
+#include <stdlib.h>
 #include "arena/arena.h"
 
 
@@ -51,6 +52,12 @@ void free_global_arenas(Compiler* arenas) {
         free(arenas->symbol_table_stack);
     }
     free(arenas);
+    if (arenas->end_ifs)
+    {
+        free(arenas->end_ifs->end_ifs);
+        free(arenas->end_ifs);
+    }
+    
 }
 
 Compiler* init_compiler_arenas(size_t file_length) {
@@ -90,6 +97,12 @@ Compiler* init_compiler_arenas(size_t file_length) {
     arenas->capacity = 16 * 1024;
     arenas->currentsize = 0;
     arenas->if_statements = 0;
+    
+    // start with 32 and could grow dynamically
+    arenas->end_ifs = malloc(sizeof(end_ifs));
+    arenas->end_ifs->end_ifs = malloc(32 * sizeof(size_t*));
+    arenas->end_ifs->end_ifs_capacity = 32;
+    arenas->end_ifs->end_ifs_count = 0;
     return arenas;
 }
 

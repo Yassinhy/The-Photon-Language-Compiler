@@ -11,7 +11,9 @@ void write_to_buffer(const char* code, size_t code_length, FILE* output, Compile
     if (code_length + compiler->currentsize >= compiler->capacity)
     {
         //flush buffer to file
+        fprintf(stderr, "FLUSHING: %zu bytes\n", compiler->currentsize);
         fwrite(compiler->buffer, 1, compiler->currentsize, output);
+        fflush(output);  // ← Add this!
         compiler->currentsize = 0;
     }
     printf("----->%s\n", code);
@@ -100,6 +102,7 @@ static inline void generate_function_code(statement* stmt, size_t* num_len, FILE
 
 static void generate_statement_code(statement* stmt, size_t* num_len, FILE* output, Compiler* compiler) {
     printf("arrived\n");
+    printf("STATEMENT TYPE: %i", stmt->type);
     switch (stmt->type)
     {
     case STMT_EXIT:
@@ -147,30 +150,97 @@ static void generate_statement_code(statement* stmt, size_t* num_len, FILE* outp
             }
             break;
         }
-    case STMT_IF:
+
+    case STMT_ELIF: {
         evaluate_expression_x86_64(stmt->stmnt_if.condition, compiler, output, true);
+        compiler->if_statements++;
         // till now what is printed:
         //cmp rax, rbx
         //jne 
         
         if (stmt->stmnt_if.or_else)
         {
-            write_to_buffer(".Lelse_", 5, output, compiler);
+            write_to_buffer(".Lelse_", 7, output, compiler);
             nums_to_str(compiler->if_statements, num_len, output, compiler);
             write_to_buffer("\n", 1, output, compiler);
-            // jne .Lelse_3 for example
-    
+            // jne .Lelse_3
+            // for example
+            
+
             generate_block_code(stmt->stmnt_if.then, num_len, output, compiler);
+
+
             // now jump to endif
             write_to_buffer("jmp .end_if_", 12, output, compiler);
             nums_to_str(compiler->if_statements, num_len, output, compiler);
             write_to_buffer("\n", 1, output, compiler);
             // now the else block
-            write_to_buffer(".Lelse_", 5, output, compiler);
+            write_to_buffer(".Lelse_", 7, output, compiler);
             nums_to_str(compiler->if_statements, num_len, output, compiler);
             write_to_buffer(":\n", 2, output, compiler);
             // .Lelse_3:\n
-            generate_block_code(stmt->stmnt_if.or_else, num_len, output, compiler);
+            if (stmt->stmnt_if.or_else->type == STMT_ELIF) { // else if case
+                generate_statement_code(stmt->stmnt_if.or_else, num_len, output, compiler);
+            } else { // plain else case
+                generate_block_code(stmt->stmnt_if.or_else, num_len, output, compiler);
+                // compiler->if_statements++;
+            }
+            
+        }
+        
+        else {
+            write_to_buffer(".end_if_", 8, output, compiler);
+            nums_to_str(peek_endifs(compiler), num_len, output, compiler);
+            write_to_buffer("\n", 1, output, compiler);
+            // jne .Lelse_3 for example
+    
+            generate_block_code(stmt->stmnt_if.then, num_len, output, compiler);
+        }
+
+        // now the end_if
+        write_to_buffer(".end_if_", 8, output, compiler);
+        nums_to_str(compiler->if_statements, num_len, output, compiler);
+        write_to_buffer(":\n", 2, output, compiler);
+        compiler->if_statements++;
+        break;
+    }
+
+    case STMT_IF: {
+        evaluate_expression_x86_64(stmt->stmnt_if.condition, compiler, output, true);
+        push_endifs(compiler);
+        compiler->if_statements++;
+        // till now what is printed:
+        //cmp rax, rbx
+        //jne 
+        
+        if (stmt->stmnt_if.or_else)
+        {
+            write_to_buffer(".Lelse_", 7, output, compiler);
+            nums_to_str(compiler->if_statements, num_len, output, compiler);
+            write_to_buffer("\n", 1, output, compiler);
+            // jne .Lelse_3
+            // for example
+            
+
+            generate_block_code(stmt->stmnt_if.then, num_len, output, compiler);
+
+
+            // now jump to endif
+            write_to_buffer("jmp .end_if_", 12, output, compiler);
+            nums_to_str(compiler->if_statements, num_len, output, compiler);
+            write_to_buffer("\n", 1, output, compiler);
+            // now the else block
+            write_to_buffer(".Lelse_", 7, output, compiler);
+            nums_to_str(compiler->if_statements, num_len, output, compiler);
+            write_to_buffer(":\n", 2, output, compiler);
+            // .Lelse_3:\n
+            if (stmt->stmnt_if.or_else->type == STMT_ELIF) { // else if case
+                generate_statement_code(stmt->stmnt_if.or_else, num_len, output, compiler);
+            } else { // plain else case
+                generate_block_code(stmt->stmnt_if.or_else, num_len, output, compiler);
+                // compiler->if_statements++;
+            }
+            
         }
         
         else {
@@ -184,10 +254,12 @@ static void generate_statement_code(statement* stmt, size_t* num_len, FILE* outp
 
         // now the end_if
         write_to_buffer(".end_if_", 8, output, compiler);
-        nums_to_str(compiler->if_statements, num_len, output, compiler);
+        nums_to_str(peek_endifs(compiler), num_len, output, compiler);
         write_to_buffer(":\n", 2, output, compiler);
         compiler->if_statements++;
+        pop_endifs(compiler);
         break;
+    }
     default:
         break;
     }  
@@ -249,6 +321,7 @@ void generate_assembly_x86_64(const AST* AST, Compiler* compiler, FILE* output){
 
     write_to_buffer("\nsection .rodata\nerr_div0:\tdb \"division by zero\", 10\nerr_div0_len:  equ $ - err_div0\n", 85, output, compiler);
     fwrite(compiler->buffer, 1, compiler->currentsize, output);
+    fflush(output);
     fclose(output);
     //gcc phc.c -o phc && ./phc test.ph
     //nasm -f elf64 output.asm && ld output.o -o output && ./output

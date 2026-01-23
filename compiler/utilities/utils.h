@@ -274,6 +274,7 @@ typedef enum {
     STMT_EXPRESSION,
     STMT_BLOCK,
     STMT_IF,
+    STMT_ELIF,
     STMT_WHILE,
     STMT_FOR,
     STMT_FUNCTION,
@@ -433,6 +434,14 @@ typedef struct {
     struct symbol_table** storage;
 } symbol_table_stack;
 
+typedef struct end_ifs
+{
+    size_t* end_ifs;
+    size_t end_ifs_count;
+    size_t end_ifs_capacity;
+}end_ifs;
+
+
 typedef struct {
     Arena* token_arena;     // For tokens and lexer data
     Arena* statements_arena;       // For AST nodes and parser data  
@@ -458,6 +467,8 @@ typedef struct {
 
     // If statement counter
     size_t if_statements;
+
+    end_ifs* end_ifs;
 } Compiler;
 
 // Arrays:

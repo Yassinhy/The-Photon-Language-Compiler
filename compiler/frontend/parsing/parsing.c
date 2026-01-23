@@ -198,10 +198,12 @@ node* parse_if_node(Compiler* compiler, Parser* parser) {
 
 node* parse_else_node(Compiler* compiler, Parser* parser) {
     if (advance(parser)->type != TOK_ELSE) panic(ERROR_SYNTAX, "expected else statement", compiler);
-    if (peek(parser, 0)->type == TOK_IF)
+    if (peek(parser, 0)->type == TOK_IF) // else if
     {
-        return parse_if_node(compiler, parser);
-    } else if (peek(parser, 0)->type == TOK_LBRACE)
+        node* else_if = parse_if_node(compiler, parser);
+        else_if->stmnt->type = STMT_ELIF;
+        return else_if;
+    } else if (peek(parser, 0)->type == TOK_LBRACE) // else {}
     {
         return parse_code_block(compiler, parser, false, NULL, 0);
     } else {

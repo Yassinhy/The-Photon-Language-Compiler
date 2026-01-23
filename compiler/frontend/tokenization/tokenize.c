@@ -238,6 +238,11 @@ void tokenize(const char* source, Compiler* compiler, size_t* token_count, size_
         
             tokens[*token_count].line = line_number;         
             i++;
+            while (source[i] == ' ' || source[i] == '\t' || source[i] == '\r')
+            {
+                i++;
+            }
+            
             switch (source[i])
             {
                 case 'i':
